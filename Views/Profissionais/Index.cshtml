@@ -1,0 +1,38 @@
+﻿@model IEnumerable<IEL_Application.Models.Profissional>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Cargo</th>
+        </tr>
+    </thead>
+    <tbody>
+       @foreach (var profissional in ViewData["profissionais"] as IList<Profissional>) 
+        {
+                <tr>
+                    <td> 
+                      @profissional.Nome
+                    </td>       
+                     <td> 
+                      @profissional.Cargo
+                    </td> 
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@profissional.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@profissional.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@profissional.Id">Delete</a> |
+                        <a asp-action="Jornada" asp-route-id="@profissional.Id">Jornada</a>
+                     </td>
+                </tr>
+        }
+    </tbody>
+</table>

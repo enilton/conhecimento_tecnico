@@ -1,0 +1,139 @@
+﻿<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="http://digitalbush.com/wp-content/uploads/2014/10/jquery.maskedinput.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.0/jquery.mask.js"></script>
+
+ <script>
+        $(document).ready(function () { 
+
+            $("#CPF").mask('000.000.000-00', {reverse: true});
+            $("#Telefone").mask('(00) 9 0000-0000', {reverse: true});
+            $("#Endereco_CEP").mask('00000-000', {reverse: true});
+            $("#SalarioProposto").mask('000.000,00', {reverse: true});
+            $("#CategoriaHabilitacao").hide();
+            $("#HoraInicio").mask('00:00', {reverse: true});
+            $("#HoraFim").mask('00:00', {reverse: true});
+
+            $("#Habilitacao").click(function() {
+                 habilitarCategoria($("#Habilitacao").is(':checked'))
+            });
+      
+           $("#Endereco_IdentificadorUF").change(function() {
+                listaCidade($(this).val());
+           });
+
+           $("#Endereco_CEP").blur(function() {
+                buscarEndereco($(this).val());
+           });
+
+           $("#addDiaDeTrabalho").click(function () {
+               adicionarDiaDeTrabalho(                
+                
+               );
+           });
+
+           $("#TempoDescanso").blur(function() {
+                calcularCargaHorariaDiaria();
+           });
+        });
+
+        function calcularCargaHorariaDiaria(){
+
+            var hs =  $("#HoraInicio").val();
+            var hf =  $("#HoraFim").val();
+            var descanso = $("#TempoDescanso").val();
+
+            if (hs && hf && descanso) {
+
+                //horainicial to time
+                var horaInicioT = new Date(2000,0,1,hs.split(':')[0],hs.split(':')[1]);
+                var horaFimT = new Date(2000,0,1,hf.split(':')[0],hf.split(':')[1]);               
+
+                var chDiaria = ((horaFimT.getTime() - horaInicioT.getTime())/1000/60/60) - descanso
+
+                if (chDiaria > 10)
+                    alert('Carga horária maior que 10H');
+
+                $("#CargaHorariaDiaria").val(chDiaria);
+            }
+          
+        }
+
+        function listaCidade(estadoId) { 
+            $.ajax({
+                url: '/Profissionais/ListaCidadeAsync',
+                dataType: 'json',
+                method: 'GET',
+                data: { estadoId: estadoId },
+                success: function (data) {
+                    console.log('Success:', data);
+                    listaCidadeCallBack(data);
+
+                },
+                error: function (data) {                    
+                    console.warn('Error:', data);
+
+                }
+            })
+        }
+
+        function listaCidadeCallBack(json) {      
+            console.log(json);
+            $("#IdentificadorMunicipio :gt(0)").remove();
+            $(json).each(function() {
+                
+                $("#IdentificadorMunicipio").append("<option value='" + this.id + "'>" + this.nome + "</option>");
+            });
+        }
+
+        function buscarEndereco(cep) {           
+
+            $.ajax({
+                url: '/Profissionais/BuscaEnderecoAsync',
+                dataType: 'json',
+                method: 'GET',
+                data: { cep: cep },
+                success: function (data) {
+                    console.log('Success:', data);
+                    buscarEnderecoCallBack(data);
+
+                },
+                error: function (data) {                   
+                    console.warn('Error:', data);
+
+                }
+            })
+        }
+
+        function buscarEnderecoCallBack(json) {
+            $("#Endereco_Logradouro").val(json.logradouro)
+        }
+
+        function habilitarCategoria(ativo) {
+            if(ativo)
+                    $("#CategoriaHabilitacao").show();  
+                else
+                    $("#CategoriaHabilitacao").hide(); 
+        }
+
+        // function adicionarDiaDeTrabalho(estadoId) { 
+        //    $.ajax({
+        //        url: '/Profissionais/AdicionarDiaDeTrabalhoAsync',
+        //        dataType: 'json',
+        //        method: 'POST',
+        //        data: {  },
+        //        success: function (data) {
+        //            console.log('Success:', data);
+
+        //        },
+        //        error: function (data) {                    
+        //            console.warn('Error:', data);
+
+        //        }
+        //    })
+        //}
+
+
+    </script>
+
